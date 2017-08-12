@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Daytrader - jdallen.net</title>
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+  <link href="css/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <span class="glyphicon glyphicon-cloud-upload"></span>
+            <h2>Daytrader</h2>
+            <div id="content">
+              <h4 id="message">Upload your transaction history</h4>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar"></div>
+              </div>
+              <button class="btn btn-lg upload-btn" type="button">Upload File</button>
+            </div>
+            <div id="data"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- multiple="multiple" -->
+  <input id="upload-input" type="file" name="uploads[]"></br>
+
+  <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+  <script src="https://cdn.datatables.net/plug-ins/1.10.15/sorting/datetime-moment.js"></script>
+  <script src="https://cdn.datatables.net/plug-ins/1.10.15/dataRender/ellipsis.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="js/vendor/papaparse.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/display.js"></script>
+  <script src="js/upload.js"></script>
+</body>
+</html>
