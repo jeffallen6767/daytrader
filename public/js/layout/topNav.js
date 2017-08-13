@@ -29,7 +29,7 @@ Daytrader.plugin("topNav", function(app) {
         link = el.find("a");
       link.text(title);
       if (selected) {
-        link.append(srOnly);
+        link.append(srOnly.clone());
       } else {
         link.on("click", function(event) {
           state.set('page', id);
