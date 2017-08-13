@@ -6,11 +6,11 @@
  */
 ;(function (factory) {
 	var registeredInModuleLoader = false;
-	if (typeof define === 'function' && define.amd) {
+	if (typeof define === "function" && define.amd) {
 		define(factory);
 		registeredInModuleLoader = true;
 	}
-	if (typeof exports === 'object') {
+	if (typeof exports === "object") {
 		module.exports = factory();
 		registeredInModuleLoader = true;
 	}
@@ -23,48 +23,63 @@
 		};
 	}
 }(function () {
-  
-  var ns = Storages.initNamespaceStorage('daytrader-jdallen.net'),
-    storage = {
-      "cookie": ns.cookieStorage,
-      "local": ns.localStorage,
-      "session": ns.sessionStorage
-    },
-    Err = function(type, msg) {
+  var ns = Storages.initNamespaceStorage("daytrader.jdallen.net"),
+    cookie = ns.cookieStorage,
+    local = ns.localStorage,
+    session = ns.sessionStorage,
+    Err = function(type, msg, data) {
       this.type = type;
       this.message = msg;
+      this.data = data;
     },
-    root = $('#root'),
-    loading = $('#loading'),
-    current = loading,
+    current = $("#loading"),
+    appState = session.get("state") || {},
+    state = {
+      "get": function(key) {
+        return appState[key];
+      },
+      "set": function(key, val) {
+        appState[key] = val;
+        session.set("state", appState);
+      }
+    },
     app = {
-      "storage": storage,
+      "state": state,
+      "storage": {
+        "cookie": cookie,
+        "local": local,
+        "session": session
+      },
       "show": function(el) {
-        current.hide();
-        current = el;
-        el.show();
+        console.log("show", el, app);
+        if (el && el.length) {
+          if (el !== current) {
+            current.hide();
+            current = el;
+            el.show();
+          } else {
+            console.log("show el is same as current");
+          }
+        } else {
+          throw new Err("show", "el is not an element", el);
+        }
       },
       "plugin": function(id, method) {
         if (methods[id]) {
-          throw new Err("plugin", "Method Exists: " + id);
+          throw new Err("plugin", "Method exists", id);
         }
         methods[id] = true;
         app[id] = method(app);
       },
       "run": function() {
-        var session = storage.session.get(),
-          user = session.user,
-          next = app.layout,
-          cookie;
-        //console.log("session", session, user);
+        var next = app.dashboard,
+          user = state.get("user");
         if (user) {
           next();
         } else {
-          cookie = storage.cookie.get();
-          user = cookie.user;
-          //console.log("cookie", cookie, user);
+          user = cookie.get("user");
           if (user) {
-            session.set('user', user);
+            state.set("user", user);
             next();
           } else {
             app.signin(app.run);
