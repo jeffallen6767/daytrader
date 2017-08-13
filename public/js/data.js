@@ -187,7 +187,9 @@ Daytrader.plugin("data", function(app) {
     },
 
     api = {
-      
+      "save": function(data) {
+        console.log("data.save", data);
+      }
     };
   return api;
 });

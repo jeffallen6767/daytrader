@@ -101,7 +101,8 @@ Daytrader.plugin("load", function(app) {
         console.log("parseCsv errors...");
         console.log(result);
       } else {
-        initDisplay(data);
+        //initDisplay(data);
+        app.data.save(data);
       }
     },
     // Check for the various File API support.
