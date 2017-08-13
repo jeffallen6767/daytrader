@@ -10,6 +10,16 @@ Daytrader.plugin("load", function(app) {
     progressBar = gui.find(".progress-bar"),
     uploadButton = gui.find(".upload-btn"),
     uploadInput = gui.find("#upload-input"),
+    parseCsv = function parseCsv(text) {
+      console.log('text');
+      console.log(text);
+      var results = Papa.parse(text, {
+        dynamicTyping: true
+      });
+      console.log('results of Papa.parse');
+      console.log(results);
+      return results;
+    },
     updateProgress = function updateProgress(evt) {
       if (evt.lengthComputable) {
         // calculate the percentage of upload completed

@@ -1,5 +1,6 @@
 .btn:focus, .upload-btn:focus{
   outline: 0 !important;
+  box-shadow: none !important;
 }
 
 .upload-btn {
@@ -7,6 +8,7 @@
   background-color: #F89406;
   border: none;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .upload-btn:hover,
