@@ -30,7 +30,7 @@
       "local": ns.localStorage,
       "session": ns.sessionStorage
     },
-    err = function(type, msg) {
+    Err = function(type, msg) {
       this.type = type;
       this.message = msg;
     },
@@ -56,13 +56,13 @@
           user = session.user,
           next = app.layout,
           cookie;
-        console.log("session", session, user);
+        //console.log("session", session, user);
         if (user) {
           next();
         } else {
           cookie = storage.cookie.get();
           user = cookie.user;
-          console.log("cookie", cookie, user);
+          //console.log("cookie", cookie, user);
           if (user) {
             session.set('user', user);
             next();
@@ -76,12 +76,5 @@
       obj[method] = true;
       return obj;
     }, {});
-  console.log("methods", methods);
-  /*
-  console.log("ns", ns);
-  console.log("cs", cs);
-  console.log("ls", ls);
-  console.log("ss", ss);
-  */
   return app;
 }));
