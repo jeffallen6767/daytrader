@@ -21,6 +21,7 @@
   <!-- app css -->
   <link href="css/signin.css" rel="stylesheet" type="text/css">
   <link href="css/dashboard.css" rel="stylesheet" type="text/css">
+  <link href="css/load.css" rel="stylesheet" type="text/css">
   <link href="css/styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -124,7 +125,27 @@
           <main id="content" class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
           
             <div id="load" class="hidden">
-              Load transactions:
+              
+              <div class="container">
+                <div class="row">
+                  <div class="col">
+                    <div class="panel panel-default">
+                      <div class="panel-body">
+                        <span class="glyphicon glyphicon-cloud-upload"></span>
+                        <h2>Daytrader</h2>
+                        <div id="content">
+                          <h4 id="message">Upload your transaction history</h4>
+                          <div class="progress">
+                            <div class="progress-bar" role="progressbar"></div>
+                          </div>
+                          <button class="btn btn-lg upload-btn" type="button">Upload File</button>
+                        </div>
+                        <div id="data"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <!-- multiple="multiple"-->
               <input id="upload-input" type="file" name="uploads[]"></br>
    

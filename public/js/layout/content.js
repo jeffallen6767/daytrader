@@ -20,7 +20,6 @@ Daytrader.plugin("content", function(app) {
     }
     nextPage.show();
     last = page;
-
-    
+    app[page]();
   };
 });
