@@ -6,6 +6,7 @@
  */
 Daytrader.plugin("data", function(app) {
   var state = app.state,
+    
     brokerIds = {
       "SQPATSIACFCDTR": "scottrade",
       "DTDQSPCANRSFD": "tdameritrade"
@@ -43,7 +44,12 @@ Daytrader.plugin("data", function(app) {
       }
     },
     addReal = function addReal(a, b) {
-      return Math.round((a + b) * 1e12) / 1e12;
+      return Math.round(((a-0) + (b-0)) * 1e12) / 1e12;
+    },
+    add = function() {
+      var args = [].slice.call(arguments);
+      //console.log("add", args);
+      return args.reduce(addReal, 0);
     },
     cleanKeys = function cleanKeys(keys) {
       var result = keys.map(function(x) {
@@ -96,7 +102,11 @@ Daytrader.plugin("data", function(app) {
           for (v=0; v<numKeys; v++) {
             w[keys[v]] = z[v];
           }
-          objs.push(w);
+          if (type === "tdameritrade") {
+            objs.unshift(w);
+          } else {
+            objs.push(w);
+          }
         } else if (z.length === 1 && z[0] === '' || z[0] === '***END OF FILE***') {
           // noop, papa parse, end of data
         } else {
@@ -185,11 +195,156 @@ Daytrader.plugin("data", function(app) {
 
       return data;
     },
-
+    formats = {
+      "scottrade": {
+        // ["Symbol", "Quantity", "Price", "ActionNameUS", "TradeDate", "SettledDate", "Interest", "Amount", "Commission", "Fees", "CUSIP", "Description", "TradeNumber", "RecordType"]
+        "ActionNameUS": {
+          "key": "action",
+          "val": function(data) {
+            return data["ActionNameUS"];
+          }
+        },
+        "RecordType": {
+          "key": "type",
+          "val": function(data) {
+            return data["RecordType"];
+          }
+        },
+        "SettledDate": {
+          "key": "settle",
+          "val": function(data) {
+            return data["SettledDate"];
+          }
+        },
+        "TradeDate": {
+          "key": "trade",
+          "val": function(data) {
+            return data["TradeDate"];
+          }
+        }
+      },
+      // "&id,action,symbol,type,trade,settle,commision,fees,interest,quantity,price,amount"
+      "tdameritrade": {
+        // ["DATE", "TRANSACTION ID", "DESCRIPTION", "QUANTITY", "SYMBOL", "PRICE", "COMMISSION", "AMOUNT", "NET CASH BALANCE", "REG FEE", "SHORT-TERM RDM FEE", "FUND REDEMPTION FEE", "DEFERRED SALES CHARGE"]
+        "DATE": {
+          "key": "trade",
+          "val": function(data) {
+            return data["DATE"];
+          }
+        },
+        "TRANSACTION ID": {
+          "key": "tradenumber",
+          "val": function(data) {
+            return ["TD", data["TRANSACTION ID"]].join("-");
+          }
+        },
+        // ["IRA Receipt", "Credit Interest", "Buy", "Dividend", "Stock Dividend", "Sell", "Cash Adjustment"]
+        "NET CASH BALANCE": {
+          "key": "action",
+          "val": function(data) {
+            var desc = data["DESCRIPTION"],
+              parts = desc.split(" "),
+              one = parts[0],
+              two = parts.length > 1 ? [parts[0], parts[1]].join(" ") : "",
+              three = parts.length > 2 ? [parts[0], parts[1], parts[2]].join(" ") : "",
+              actions = {
+                "Sold": "Sell",
+                "Bought": "Buy",
+                "REBATE": "Rebate",
+                "MONEY MARKET PURCHASE": "Cash Adjustment",
+                "MONEY MARKET REDEMPTION": "Cash Adjustment",
+                "FREE BALANCE INTEREST": "Credit Interest",
+                "MONEY MARKET INTEREST": "Credit Interest",
+                "QUALIFIED DIVIDEND": "Dividend",
+                "CASH MOVEMENT OF INCOMING ACCOUNT TRANSFER": "IRA Receipt"
+              },
+              action = actions[one] || actions[two] || actions[three] || actions[desc];
+            if (!action) {
+              console.error("unknown.action, data", data);
+            }
+            return action;
+          }
+        },
+        "REG FEE": {
+          "key": "fees",
+          "val": function(data) {
+            return add(
+              data["REG FEE"],
+              data["SHORT-TERM RDM FEE"],
+              data["FUND REDEMPTION FEE"],
+              data["DEFERRED SALES CHARGE"]
+            );
+          }
+        },
+        "DEFERRED SALES CHARGE": {
+          "key": false
+        },
+        "FUND REDEMPTION FEE": {
+          "key": false
+        },
+        "SHORT-TERM RDM FEE": {
+          "key": false
+        }
+      }
+    },
+    transform = function transform(type, data) {
+      var result = {},
+        keys = Object.keys(data),
+        format = formats[type];
+      keys.forEach(function(key) {
+        var match = format[key];
+        if (match) {
+          if (match.key) {
+            result[match.key] = match.val(data);
+          } else {
+            // skip it...
+          }
+        } else {
+          result[key.toLowerCase()] = data[key];
+        }
+      });
+      return result;
+    },
+    ids = app.db.getIds(function(keys) {
+      ids = keys;
+    }),
+    keccak = app.keccak.mode("SHAKE-128"),
     api = {
       "save": function(data) {
-        console.log("data.save", data);
+        var indexed = indexData(data),
+          type = indexed.type,
+          results = {
+            "success": [],
+            "error": [],
+            "actions": []
+          };
+        console.log("save", data, indexed, type);
+        indexed.objs.forEach(function(obj, idx) {
+          var row = transform(type, obj),
+            str = JSON.stringify(row),
+            id = keccak.init().update(str).digest(8),
+            prev = ids.indexOf(id),
+            result = {
+              "id": id,
+              "prev": prev,
+              "obj": obj,
+              "row": row
+            };
+          if (results.actions.indexOf(row.action) === -1) {
+            results.actions.push(row.action);
+          }
+          row.id = id;
+          if (prev === -1) {
+            ids.push(id);
+            app.db.add(row);
+            results.success.push(result);
+          } else {
+            results.error.push(result);
+          }
+        });
+        return results;
       }
     };
+  console.log("data", [].slice.call(arguments));
   return api;
 });

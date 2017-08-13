@@ -102,7 +102,8 @@ Daytrader.plugin("load", function(app) {
         console.log(result);
       } else {
         //initDisplay(data);
-        app.data.save(data);
+        var results = app.data.save(data);
+        console.log("app.data.save.results", results);
       }
     },
     // Check for the various File API support.
