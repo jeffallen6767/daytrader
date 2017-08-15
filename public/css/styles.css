@@ -13,3 +13,8 @@ body {
   display: none;
 }
 
+.left-pad {
+  padding-left: 5px;
+}
+
+

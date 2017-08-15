@@ -1,5 +1,12 @@
-node_modules/
-
 npm-debug.log
 
+node_modules/
+
 public/js/keccak.js
+
+public/css/font-awesome.min.css
+public/css/vendor/css/
+public/css/vendor/fonts/
+
+
+

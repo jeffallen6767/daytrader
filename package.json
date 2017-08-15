@@ -14,8 +14,10 @@
   "dependencies": {
     "cross-env": "^3.1.4",
     "express": "^4.14.0",
+    "font-awesome": "^4.7.0",
     "formidable": "^1.1.1",
-    "keccak-p-js" : "https://github.com/jeffallen6767/keccak-p-js.git",
+    "keccak-p-js": "https://github.com/jeffallen6767/keccak-p-js.git",
+    "ncp": "^2.0.0",
     "winston": "^2.3.1"
   }
 }
