@@ -5,6 +5,7 @@
  * Copyright 2017 Jeffrey David Allen
  */
 Daytrader.plugin("signin", function(app) {
+  console.log("signin-plugin", [].slice.call(arguments));
   return function(next) {
     var gui = $("#signin"),
       jForm = gui.find("#signin-form"),
@@ -30,6 +31,7 @@ Daytrader.plugin("signin", function(app) {
         next();
       }
     });
+    console.log("signin-run", [].slice.call(arguments));
     app.show(gui);
   };
 });

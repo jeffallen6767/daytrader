@@ -200,6 +200,6 @@ Daytrader.plugin("display", function(app) {
   
   // initDatePlugin
   $.fn.dataTable.moment('M/D/YYYY');
-  console.log("display", [].slice.call(arguments));
+  console.log("display-plugin", [].slice.call(arguments));
   return api;
 });

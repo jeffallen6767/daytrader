@@ -27,6 +27,6 @@ Daytrader.plugin("db", function(app) {
       // "&id,action,symbol,type,trade,settle,commision,fees,interest,quantity,price,amount"
       events: "&" + schema
   });
-  console.log("db", [].slice.call(arguments));
+  console.log("db-plugin", [].slice.call(arguments));
   return api;
 });

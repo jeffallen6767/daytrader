@@ -13,8 +13,9 @@ Daytrader.plugin("topNav", function(app) {
   active.removeAttr("id");
   srOnly.remove();
   inactive.removeAttr("id");
+  console.log("topNav-plugin", [].slice.call(arguments));
   return function() {
-    console.log("topNav", [].slice.call(arguments));
+    console.log("topNav-run", [].slice.call(arguments));
     var pages = app.pages,
       list = pages.keys,
       page = state.get("page"),

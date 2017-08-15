@@ -23,17 +23,13 @@
 		};
 	}
 }(function () {
-  var ns = Storages.initNamespaceStorage("daytrader.jdallen.net"),
-    cookie = ns.cookieStorage,
-    local = ns.localStorage,
-    session = ns.sessionStorage,
+  var ns, cookie, local, session, current, appState,
+    plugins = [],
     Err = function(type, msg, data) {
       this.type = type;
       this.message = msg;
       this.data = data;
     },
-    current = $("#loading"),
-    appState = session.get("state") || {},
     state = {
       "get": function(key) {
         return appState[key];
@@ -43,13 +39,28 @@
         session.set("state", appState);
       }
     },
+    storage = {
+      "cookie": cookie,
+      "local": local,
+      "session": session
+    },
     app = {
-      "state": state,
-      "storage": {
-        "cookie": cookie,
-        "local": local,
-        "session": session
+      "init": function() {
+        ns = Storages.initNamespaceStorage("daytrader.jdallen.net");
+        cookie = storage.cookie = ns.cookieStorage;
+        local = storage.local = ns.localStorage;
+        session = storage.session = ns.sessionStorage;
+        current = $("#loading");
+        appState = session.get("state") || {};
+        // init plugins:
+        plugins.forEach(function(id) {
+          app[id] = methods[id](app);
+          methods[id] = true;
+        });
+        app.run();
       },
+      "state": state,
+      "storage": storage,
       "show": function(el) {
         console.log("show", el, app);
         if (el && el.length) {
@@ -65,11 +76,19 @@
         }
       },
       "plugin": function(id, method) {
-        if (methods[id]) {
+        var isString = typeof id,
+          isFunction = typeof method;
+        if (isString !== "string") {
+          throw new Err("plugin", "id must be a string:", isString, id);
+        }
+        if (isFunction !== "function") {
+          throw new Err("plugin", "method must be a function:", isFunction, method);
+        }
+        if (methods[id] || plugins.indexOf(id) !== -1) {
           throw new Err("plugin", "Method exists", id);
         }
-        methods[id] = true;
-        app[id] = method(app);
+        plugins.push(id);
+        methods[id] = method;
       },
       "run": function() {
         var next = app.dashboard,

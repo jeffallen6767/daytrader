@@ -6,7 +6,6 @@
  */
 Daytrader.plugin("data", function(app) {
   var state = app.state,
-    
     brokerIds = {
       "SQPATSIACFCDTR": "scottrade",
       "DTDQSPCANRSFD": "tdameritrade"
@@ -345,6 +344,6 @@ Daytrader.plugin("data", function(app) {
         return results;
       }
     };
-  console.log("data", [].slice.call(arguments));
+  console.log("data-plugin", [].slice.call(arguments));
   return api;
 });

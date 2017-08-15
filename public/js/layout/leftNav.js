@@ -7,8 +7,9 @@
 Daytrader.plugin("leftNav", function(app) {
   var state = app.state,
     gui = $("#leftNav");
+  console.log("leftNav-plugin", [].slice.call(arguments));
   return function() {
-    console.log("leftNav", [].slice.call(arguments));
+    console.log("leftNav-run", [].slice.call(arguments));
     var page = state.get("page");
     
 

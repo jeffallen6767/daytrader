@@ -19,8 +19,9 @@ Daytrader.plugin("dashboard", function(app) {
     },
     "keys": keys
   };
+  console.log("dashboard-plugin", [].slice.call(arguments));
   return function() {
-    console.log("dashboard", [].slice.call(arguments));
+    console.log("dashboard-run", [].slice.call(arguments));
     var page = state.get("page");
     if (!page) {
       page = "home";

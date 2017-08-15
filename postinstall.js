@@ -16,28 +16,27 @@ var fs = require('fs'),
     ""
   ].join("\n"),
   basePath = process.cwd(),
-  
-  what;
+  paths = [
+    "public/vendor/css/font-awesome.min.css",
+    "public/vendor/fonts/fontawesome-webfont.eot",
+    "public/vendor/fonts/fontawesome-webfont.svg",
+    "public/vendor/fonts/fontawesome-webfont.ttf",
+    "public/vendor/fonts/fontawesome-webfont.woff",
+    "public/vendor/fonts/fontawesome-webfont.woff2",
+    "public/vendor/fonts/FontAwesome.otf"
+  ].map(function(part) {
+    return path.resolve(basePath, part);
+  });
 
-fs.writeFileSync("./public/js/keccak.js", wrapped);
+// write the wrapped keccak plugin:
+fs.writeFileSync("./public/vendor/js/keccak-plugin.js", wrapped);
 
 // copy parts of font-awesome:
-ncp("./node_modules/font-awesome", "./public/css/vendor", {
+ncp("./node_modules/font-awesome", "./public/vendor", {
   rename: function(target) {
-    var paths = [
-      "public/css/vendor/css/font-awesome.min.css",
-      "public/css/vendor/fonts/fontawesome-webfont.eot",
-      "public/css/vendor/fonts/fontawesome-webfont.svg",
-      "public/css/vendor/fonts/fontawesome-webfont.ttf",
-      "public/css/vendor/fonts/fontawesome-webfont.woff",
-      "public/css/vendor/fonts/fontawesome-webfont.woff2",
-      "public/css/vendor/fonts/FontAwesome.otf"
-    ].map(function(part) {
-      return path.resolve(basePath, part);
-    });
     return (paths.indexOf(target) !== -1) ? target : ":NO-MATCH:";
   }
 }, function (err) {
-  fs.rmdirSync("./public/css/vendor/less");
-  fs.rmdirSync("./public/css/vendor/scss");
+  fs.rmdirSync("./public/vendor/less");
+  fs.rmdirSync("./public/vendor/scss");
 });

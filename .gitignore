@@ -2,11 +2,8 @@ npm-debug.log
 
 node_modules/
 
-public/js/keccak.js
+public/vendor/css/font-awesome.min.css
 
-public/css/font-awesome.min.css
-public/css/vendor/css/
-public/css/vendor/fonts/
+public/vendor/fonts/
 
-
-
+public/vendor/js/keccak-plugin.js
