@@ -7,7 +7,8 @@
 Daytrader.plugin("symbol", function(app) {
   var state = app.state,
     gui = $("#symbol"),
-    title = $("#symbol-title"),
+    title = gui.find("#symbol-title"),
+    content = gui.find("#symbol-content"),
     display = function() {
       console.log("symbol", [].slice.call(arguments));
       title.text("Loading records...");
@@ -16,8 +17,8 @@ Daytrader.plugin("symbol", function(app) {
         console.log("symbol", symbol);
         console.log("recs", recs);
         var numIds = recs.length;
-        title.text(numIds + " records for " + symbol);
-
+        title.text(numIds + " records for " + symbol.toUpperCase());
+        app.display.show.table("All", recs, content);
     };
     
   // register page:

@@ -11,11 +11,10 @@ Daytrader.plugin("display", function(app) {
       "price": "pad-right",
       "commission": "pad-right",
       "fees": "pad-right",
-      "reg fee": "pad-right",
       "amount": "pad-right"
     },
-    getDataTableOptions = function getDataTableOptions(type, data) {
-      console.log("getDataTableOptions", type, data);
+    getDataTableOptions = function getDataTableOptions(type, keys) {
+      console.log("getDataTableOptions", type, keys);
       var result;
       switch (type) {
         case "Dividend":
@@ -27,8 +26,10 @@ Daytrader.plugin("display", function(app) {
         default:
           result = {
             "order": [[ 0, "desc" ]],
+            "pageLength": 15,
+            "lengthMenu": [ [10, 15, 25, 50, -1], [10, 15, 25, 50, "All"] ],
             "columnDefs": [ {
-              targets: data.idx.calc[type].keys.length - 1,
+              targets: keys.indexOf("description"),
               render: $.fn.dataTable.render.ellipsis( 60, true )
             } ]
           };
@@ -146,28 +147,36 @@ Daytrader.plugin("display", function(app) {
       var mod = cssMods[key.toLowerCase()];
       return mod ? ' class="' + mod + '"' : '';
     },
-    showDataTable = function showDataTable(type, data) {
+    keysByType = {
+      "All": [
+        ["trade", "Date"],
+        ["action", "Action"],
+        ["symbol", "Symbol"],
+        ["quantity", "Quantity"],
+        ["price", "Price"],
+        ["commission", "Commission"],
+        ["fees", "Fees"],
+        ["amount", "Amount"],
+        ["description", "Description"]
+      ]
+    },
+    getTable = function getTable(type, data, keys) {
       
-      console.log("showDataTable", type, data);
+      console.log("getTable", type, data);
 
       var table = '<table class="display compact" cellspacing="0" width="100%">',
         thead = '<thead><tr>',
         tfoot = '<tfoot><tr>',
         tbody = '<tbody>',
         
-        vals = data.vals,
-        div = data.idx.calc[type],
-        idxs = div.idxs,
-        keys = div.keys,
+        numVals = data.length,
         numKeys = keys.length,
-        idxKeys = data.idx.keys,
-        numIdxs = idxs.length,
-
+        
         val, idx, key, v, w, x, y, z;
 
       // head/foot
       for (x=0; x<numKeys; x++) {
-        key = keys[x];
+        key = keys[x][1];
         thead += '<th>' + key + '</th>';
         tfoot += '<th>' + key + '</th>';
       }
@@ -175,15 +184,13 @@ Daytrader.plugin("display", function(app) {
       tfoot = $(tfoot + '</tr></tfoot>');
 
       // body
-      for (x=0; x<numIdxs; x++) {
-        idx = idxs[x];
-        val = vals[idx];
+      for (x=0; x<numVals; x++) {
+        val = data[x];
         tbody += '<tr>';
         for (y=0; y<numKeys; y++) {
-          key = keys[y];
+          key = keys[y][0];
           w = getCssMod(key);
-          z = idxKeys[key];
-          v = val[z];
+          v = val[key];
           tbody += '<td' + w + '>' + v + '</td>';
         }
         tbody += '</tr>';
@@ -195,7 +202,18 @@ Daytrader.plugin("display", function(app) {
     },
     
     api = {
-      
+      "show": {
+        "table": function(type, data, el) {
+          console.log("display.show.table", type, data, el);
+          var keys = keysByType[type],
+            idxs = keys.map(function(key){return key[0];}),
+            table = getTable(type, data, keys);
+          domReplace(el, table);
+          table.DataTable(
+            getDataTableOptions(type, idxs)
+          );
+        }
+      }
     };
   
   // initDatePlugin

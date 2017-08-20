@@ -220,6 +220,12 @@ Daytrader.plugin("data", function(app) {
           "val": function(data) {
             return data["TradeDate"];
           }
+        },
+        "Commission": {
+          "key": "commission",
+          "val": function(data) {
+            return data["Commission"] - 0;
+          }
         }
       },
       // "&id,action,symbol,type,trade,settle,commision,fees,interest,quantity,price,amount"
@@ -283,6 +289,12 @@ Daytrader.plugin("data", function(app) {
         },
         "SHORT-TERM RDM FEE": {
           "key": false
+        },
+        "COMMISSION": {
+          "key": "commission",
+          "val": function(data) {
+            return data["COMMISSION"] - 0;
+          }
         }
       }
     },
@@ -307,21 +319,24 @@ Daytrader.plugin("data", function(app) {
     ids = [],
     byId = {},
     bySymbol = {},
+    addRec = function(row) {
+      var id = row.id,
+        symbol = row.symbol;
+      ids.push(id);
+      byId[id] = row;
+      if (bySymbol[symbol]) {
+        bySymbol[symbol].push(row);
+      } else {
+        bySymbol[symbol] = [row];
+      }
+    },
     recs = app.db.getAll(function(all) {
       console.log("recs", all);
       var num = all.length,
         x,row,id,symbol;
       for (x=0; x<num; x++) {
         row = all[x];
-        id = row.id;
-        ids[x] = id;
-        byId[id] = row;
-        symbol = row.symbol;
-        if (bySymbol[symbol]) {
-          bySymbol[symbol].push(row);
-        } else {
-          bySymbol[symbol] = [row];
-        }
+        addRec(row);
       }
       recs = all;
       api.ready = true;
@@ -339,12 +354,13 @@ Daytrader.plugin("data", function(app) {
             result = recs;
             break;
         }
-        return result;
+        return result || [];
       },
       "get": {
         "ids": function () {
           return ids;
-        }
+        },
+        "calc": getCalc
       },
       "save": function(data) {
         var indexed = indexData(data),
@@ -371,8 +387,7 @@ Daytrader.plugin("data", function(app) {
           }
           row.id = id;
           if (prev === -1) {
-            ids.push(id);
-            recs.push(row);
+            addRec(row);
             app.db.add(row);
             results.success.push(result);
           } else {
