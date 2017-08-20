@@ -304,11 +304,48 @@ Daytrader.plugin("data", function(app) {
       });
       return result;
     },
-    ids = app.db.getIds(function(keys) {
-      ids = keys;
+    ids = [],
+    byId = {},
+    bySymbol = {},
+    recs = app.db.getAll(function(all) {
+      console.log("recs", all);
+      var num = all.length,
+        x,row,id,symbol;
+      for (x=0; x<num; x++) {
+        row = all[x];
+        id = row.id;
+        ids[x] = id;
+        byId[id] = row;
+        symbol = row.symbol;
+        if (bySymbol[symbol]) {
+          bySymbol[symbol].push(row);
+        } else {
+          bySymbol[symbol] = [row];
+        }
+      }
+      recs = all;
+      api.ready = true;
     }),
     keccak = app.keccak.mode("SHAKE-128"),
     api = {
+      "ready": false,
+      "find": function(by, val) {
+        var result;
+        switch(by) {
+          case "symbol":
+            result = bySymbol[val.toUpperCase()];
+            break;
+          default:
+            result = recs;
+            break;
+        }
+        return result;
+      },
+      "get": {
+        "ids": function () {
+          return ids;
+        }
+      },
       "save": function(data) {
         var indexed = indexData(data),
           type = indexed.type,
@@ -335,6 +372,7 @@ Daytrader.plugin("data", function(app) {
           row.id = id;
           if (prev === -1) {
             ids.push(id);
+            recs.push(row);
             app.db.add(row);
             results.success.push(result);
           } else {

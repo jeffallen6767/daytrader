@@ -21,6 +21,10 @@ Daytrader.plugin("db", function(app) {
       },
       "getIds": function(next) {
         return db.events.toCollection().keys(next);
+      },
+      "getAll": function(next) {
+        // next(db.events.toArray());
+        return db.events.toArray(next);
       }
     };
   db.version(1).stores({

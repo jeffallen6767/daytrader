@@ -6,16 +6,21 @@
  */
 Daytrader.plugin("home", function(app) {
   var state = app.state,
-    gui = $("#home");
+    gui = $("#home"),
+    title = $("#home-title"),
+    display = function() {
+      console.log("home", [].slice.call(arguments));
+      title.text("Loading records...");
+      var ids = app.data.get.ids(),
+        numIds = ids.length;
+      console.log("home.ids", ids);
+      title.text(numIds + " records");
+    };
+    
+  // register page:
   app.pages.set("home", {
     "title": "Home"
   });
-  return function() {
-    console.log("home", [].slice.call(arguments));
-    var page = state.get("page");
-    
-
-
-    
-  };
+  
+  return display;
 });

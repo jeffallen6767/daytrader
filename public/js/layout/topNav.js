@@ -7,12 +7,39 @@
 Daytrader.plugin("topNav", function(app) {
   var state = app.state,
     gui = $("#topNav"),
-    active = gui.find("#topNavLinkActive"),
+    nav = gui.find("#topNavLinks"),
+    active = nav.find("#topNavLinkActive"),
     srOnly = active.find(".sr-only"),
-    inactive = gui.find("#topNavLinkInactive");
+    inactive = nav.find("#topNavLinkInactive"),
+    searchForm = gui.find("#search-form"),
+    searchBox = gui.find("#search-box"),
+    searchButton = gui.find("#search-button");
   active.removeAttr("id");
   srOnly.remove();
   inactive.removeAttr("id");
+  // search box
+  searchForm.submit(function(e) {
+    var term = searchBox.val();
+    console.log("search.form", term);
+    e.preventDefault();
+    searchBox.val("");
+    app.next.state({
+      "page": "symbol",
+      "term": term
+    });
+  });
+  /*
+  searchButton.on("click", function(e) {
+    var term = searchBox.val();
+    console.log("search.click", term);
+    e.preventDefault();
+    app.next.state({
+      "page": "symbol",
+      "term": term
+    });
+    searchBox.val("");
+  });
+  */
   console.log("topNav-plugin", [].slice.call(arguments));
   return function() {
     console.log("topNav-run", [].slice.call(arguments));
@@ -20,8 +47,7 @@ Daytrader.plugin("topNav", function(app) {
       list = pages.keys,
       page = state.get("page"),
       links = [];
-    //console.log("list", list);
-    //console.log("page", page);
+    // top nav links
     list.forEach(function(id) {
       var meta = pages.get(id),
         title = meta.title,
@@ -41,6 +67,6 @@ Daytrader.plugin("topNav", function(app) {
       el.removeClass("hidden");
       links.push(el);
     });
-    gui.empty().append(links);
+    nav.empty().append(links);
   };
 });

@@ -56,6 +56,18 @@
       "local": local,
       "session": session
     },
+    ready = function(next, mills) {
+      // wait for data
+      if (app.data.ready) {
+        next();
+      } else {
+        var ms = app.backoff(mills);
+        console.log("app.ready", mills, ms);
+        app.next.tick(function() {
+          ready(next, ms);
+        }, ms);
+      }
+    },
     app = {
       "Err": Err,
       "init": function() {
@@ -88,7 +100,13 @@
           }
           state.setAll(kvs);
           app.run();
+        },
+        "tick": function(next, ms) {
+          setTimeout(next, ms);
         }
+      },
+      "backoff": function(mills) {
+        return (mills || 2) * 2;
       },
       "show": function(el) {
         //console.log("show", el, app);
@@ -120,15 +138,14 @@
         methods[id] = method;
       },
       "run": function() {
-        var next = app.dashboard,
-          user = state.get("user");
+        var user = state.get("user");
         if (user) {
-          next();
+          ready(app.dashboard);
         } else {
           user = cookie.get("user");
           if (user) {
             state.set("user", user);
-            next();
+            ready(app.dashboard);
           } else {
             app.signin(app.run);
           }
