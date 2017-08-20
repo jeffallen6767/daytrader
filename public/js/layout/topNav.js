@@ -20,8 +20,8 @@ Daytrader.plugin("topNav", function(app) {
       list = pages.keys,
       page = state.get("page"),
       links = [];
-    console.log("list", list);
-    console.log("page", page);
+    //console.log("list", list);
+    //console.log("page", page);
     list.forEach(function(id) {
       var meta = pages.get(id),
         title = meta.title,
@@ -33,8 +33,9 @@ Daytrader.plugin("topNav", function(app) {
         link.append(srOnly.clone());
       } else {
         link.on("click", function(event) {
-          state.set('page', id);
-          app.run();
+          app.next.state({
+            page: id
+          });
         });
       }
       el.removeClass("hidden");

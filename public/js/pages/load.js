@@ -11,13 +11,13 @@ Daytrader.plugin("load", function(app) {
     uploadButton = gui.find(".upload-btn"),
     uploadInput = gui.find("#upload-input"),
     parseCsv = function parseCsv(text) {
-      console.log('text');
-      console.log(text);
+      //console.log('text');
+      //console.log(text);
       var results = Papa.parse(text, {
         dynamicTyping: true
       });
-      console.log('results of Papa.parse');
-      console.log(results);
+      //console.log('results of Papa.parse');
+      //console.log(results);
       return results;
     },
     updateProgress = function updateProgress(evt) {
@@ -33,6 +33,10 @@ Daytrader.plugin("load", function(app) {
           progressBar.html("Done");
         }
       }
+    },
+    resetProgress = function() {
+      progressBar.text("0%");
+      progressBar.width("0%");
     },
     ServerSideFileUpload = function ServerSideFileUpload(files) {
       // create a FormData object which will be sent as the data payload in the
@@ -51,8 +55,8 @@ Daytrader.plugin("load", function(app) {
         processData: false,
         contentType: false,
         success: function(data){
-          console.log("upload successful!");
-          console.log(data);
+          //console.log("upload successful!");
+          //console.log(data);
           var files = data.files;
           var keys = Object.keys(files);
           keys.forEach(function(key) {
@@ -70,17 +74,18 @@ Daytrader.plugin("load", function(app) {
       });
     },
     ClientSideFileUpload = function ClientSideFileUpload(files) {
+      //console.log("clientsidefileupload", files);
       for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var reader = new FileReader();
         reader.onProgress = function(evt) {
-          console.log("reader.onprogress");
-          console.log(evt);
+          //console.log("reader.onprogress");
+          //console.log(evt);
           updateProgress(evt);
         };
         reader.onload = function(evt) {
-          console.log("reader.onload");
-          console.log(evt);
+          //console.log("reader.onload");
+          //console.log(evt);
           updateProgress(evt);
           var result = evt.currentTarget.result;
           handleData(result);
@@ -89,21 +94,23 @@ Daytrader.plugin("load", function(app) {
       }
     },
     handleData = function handleData(text) {
+      //console.log("load.handleData", text);
       var result = parseCsv(text),
         meta = result.meta,
         errs = result.errors,
         data = result.data;
 
       if (meta.aborted) {
-        console.log("parseCsv aborted...");
-        console.log(result);
+        throw new app.Err("load", "parseCsv.meta.aborted", {text:text,result:result});
       } else if (errs.length) {
-        console.log("parseCsv errors...");
-        console.log(result);
+        throw new app.Err("load", "parseCsv.meta.errors", {text:text,result:result});
       } else {
-        //initDisplay(data);
         var results = app.data.save(data);
-        console.log("app.data.save.results", results);
+        //console.log("app.data.save.results", results);
+        resetProgress();
+        app.next.state({
+          page: "home"
+        });
       }
     },
     // Check for the various File API support.
@@ -112,25 +119,24 @@ Daytrader.plugin("load", function(app) {
   
   uploadButton.on("click", function () {
     uploadInput.click();
-    progressBar.text("0%");
-    progressBar.width("0%");
   });
 
   uploadInput.on("change", function() {
-    var files = $(this).get(0).files;
-    console.log(files);
+    var files = this.files;
+    //console.log("uploadInput.change", files);
     if (files.length > 0) {
       uploader(files);
     }
+    this.value = "";
   });
-
+  
+  // register this page:
   app.pages.set("load", {
     "title": "Load"
   });
 
   return function() {
-    console.log("load", [].slice.call(arguments));
-    progressBar.text("0%");
-    progressBar.width("0%");
+    //console.log("load", [].slice.call(arguments));
+    resetProgress();
   };
 });

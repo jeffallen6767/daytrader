@@ -37,6 +37,18 @@
       "set": function(key, val) {
         appState[key] = val;
         session.set("state", appState);
+      },
+      "setAll": function(kvs) {
+        //console.log("state.setAll", kvs);
+        var num = kvs.length,
+          k,v,x,y;
+        for (x=0; x<num; x++) {
+          y = kvs[x];
+          k = y[0];
+          v = y[1];
+          appState[k] = v;
+        }
+        session.set("state", appState);
       }
     },
     storage = {
@@ -45,6 +57,7 @@
       "session": session
     },
     app = {
+      "Err": Err,
       "init": function() {
         ns = Storages.initNamespaceStorage("daytrader.jdallen.net");
         cookie = storage.cookie = ns.cookieStorage;
@@ -61,15 +74,31 @@
       },
       "state": state,
       "storage": storage,
+      "next": {
+        "state": function(obj) {
+          //console.log("next.state", obj);
+          var keys = Object.keys(obj),
+            num = keys.length,
+            kvs = [],
+            x,y,z;
+          for (x=0; x<num; x++) {
+            y = keys[x];
+            z = obj[y];
+            kvs[x] = [y,z];
+          }
+          state.setAll(kvs);
+          app.run();
+        }
+      },
       "show": function(el) {
-        console.log("show", el, app);
+        //console.log("show", el, app);
         if (el && el.length) {
           if (el !== current) {
             current.hide();
             current = el;
             el.show();
           } else {
-            console.log("show el is same as current");
+            //console.log("show el is same as current");
           }
         } else {
           throw new Err("show", "el is not an element", el);

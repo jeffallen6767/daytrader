@@ -259,7 +259,7 @@ Daytrader.plugin("data", function(app) {
               },
               action = actions[one] || actions[two] || actions[three] || actions[desc];
             if (!action) {
-              console.error("unknown.action, data", data);
+              throw new app.Err("data", "unknown.action", {data:data});
             }
             return action;
           }
@@ -317,7 +317,7 @@ Daytrader.plugin("data", function(app) {
             "error": [],
             "actions": []
           };
-        console.log("save", data, indexed, type);
+        //console.log("save", data, indexed, type);
         indexed.objs.forEach(function(obj, idx) {
           var row = transform(type, obj),
             str = JSON.stringify(row),

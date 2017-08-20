@@ -14,8 +14,12 @@ Daytrader.plugin("dashboard", function(app) {
       return pages[key];
     },
     "set": function(key, val) {
-      keys.push(key);
-      pages[key] = val;
+      if (keys.indexOf(key) !== -1 || pages[key]) {
+        throw new app.Err("dashboard.pages", "page already exists", {key:key, val:val, page:pages[key]});
+      } else {
+        keys.push(key);
+        pages[key] = val;
+      }
     },
     "keys": keys
   };

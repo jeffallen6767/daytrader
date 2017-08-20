@@ -13,9 +13,11 @@ Daytrader.plugin("content", function(app) {
     last;
   console.log("content-plugin", [].slice.call(arguments));
   return function() {
-    console.log("content-run", [].slice.call(arguments));
     var page = state.get("page"),
       nextPage = getPage(page);
+      
+    console.log("content-run", "page", page, "last", last);
+    
     if (last && last !== page) {
       getPage(last).hide();
     }
