@@ -318,12 +318,14 @@ Daytrader.plugin("data", function(app) {
       return result;
     },
     ids = [],
+    rows = [],
     byId = {},
     bySymbol = {},
     addRec = function(row) {
       var id = row.id,
         symbol = row.symbol;
       ids.push(id);
+      rows.push(row);
       byId[id] = row;
       if (bySymbol[symbol]) {
         bySymbol[symbol].push(row);
@@ -349,13 +351,15 @@ Daytrader.plugin("data", function(app) {
         var result;
         switch(by) {
           case "symbol":
-            result = bySymbol[val.toUpperCase()];
+            if (val) {
+              result = bySymbol[val.toUpperCase()];
+            }
             break;
           default:
-            result = recs;
+            result = rows;
             break;
         }
-        return result || [];
+        return result || rows;
       },
       "get": {
         "ids": function () {

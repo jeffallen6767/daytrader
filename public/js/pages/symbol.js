@@ -13,11 +13,12 @@ Daytrader.plugin("symbol", function(app) {
       console.log("symbol", [].slice.call(arguments));
       title.text("Loading records...");
       var symbol = state.get("term"),
-        recs = app.data.find("symbol", symbol);
+        recs = app.data.find("symbol", symbol),
+        numIds = recs.length,
+        symbolTitle = symbol ? numIds + " records for " + symbol.toUpperCase() : "ALL RECORDS (" + numIds + ")";
         console.log("symbol", symbol);
         console.log("recs", recs);
-        var numIds = recs.length;
-        title.text(numIds + " records for " + symbol.toUpperCase());
+        title.text(symbolTitle);
         app.display.show.table("All", recs, content);
     };
     
