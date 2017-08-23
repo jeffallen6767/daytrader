@@ -194,6 +194,19 @@ Daytrader.plugin("data", function(app) {
 
       return data;
     },
+    TD_ACTIONS = {
+      "Sold": "Sell",
+      "Bought": "Buy",
+      "REBATE": "Rebate",
+      "MONEY MARKET PURCHASE": "Cash Adjustment",
+      "MONEY MARKET REDEMPTION": "Cash Adjustment",
+      "FREE BALANCE INTEREST": "Credit Interest",
+      "MONEY MARKET INTEREST": "Credit Interest",
+      "QUALIFIED DIVIDEND": "Dividend",
+      "PARTNERSHIP DISTRIBUTION": "Dividend",
+      "LONG TERM GAIN DISTRIBUTION": "Dividend",
+      "CASH MOVEMENT OF INCOMING ACCOUNT TRANSFER": "IRA Receipt"
+    },
     formats = {
       "scottrade": {
         // ["Symbol", "Quantity", "Price", "ActionNameUS", "TradeDate", "SettledDate", "Interest", "Amount", "Commission", "Fees", "CUSIP", "Description", "TradeNumber", "RecordType"]
@@ -249,21 +262,9 @@ Daytrader.plugin("data", function(app) {
           "val": function(data) {
             var desc = data["DESCRIPTION"],
               parts = desc.split(" "),
-              one = parts[0],
-              two = parts.length > 1 ? [parts[0], parts[1]].join(" ") : "",
-              three = parts.length > 2 ? [parts[0], parts[1], parts[2]].join(" ") : "",
-              actions = {
-                "Sold": "Sell",
-                "Bought": "Buy",
-                "REBATE": "Rebate",
-                "MONEY MARKET PURCHASE": "Cash Adjustment",
-                "MONEY MARKET REDEMPTION": "Cash Adjustment",
-                "FREE BALANCE INTEREST": "Credit Interest",
-                "MONEY MARKET INTEREST": "Credit Interest",
-                "QUALIFIED DIVIDEND": "Dividend",
-                "CASH MOVEMENT OF INCOMING ACCOUNT TRANSFER": "IRA Receipt"
-              },
-              action = actions[one] || actions[two] || actions[three] || actions[desc];
+              action = parts.reduce(function(acc, val, idx) {
+                return acc ? acc : (val = TD_ACTIONS[parts.slice(0,idx+1).join(" ")]) ? val : null;
+              }, null);
             if (!action) {
               throw new app.Err("data", "unknown.action", {data:data});
             }
