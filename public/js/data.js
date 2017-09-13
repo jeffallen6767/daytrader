@@ -45,10 +45,43 @@ Daytrader.plugin("data", function(app) {
     addReal = function addReal(a, b) {
       return Math.round(((a-0) + (b-0)) * 1e12) / 1e12;
     },
+    subtractReal = function subtractReal(a, b) {
+      return Math.round(((a-0) - (b-0)) * 1e12) / 1e12;
+    },
+    multiplyReal = function multiplyReal(a, b) {
+      return Math.round(((a-0) * (b-0)) * 1e12) / 1e12;
+    },
+    divideReal = function divideReal(a, b) {
+      return Math.round(((a-0) / (b-0)) * 1e12) / 1e12;
+    },
     add = function() {
-      var args = [].slice.call(arguments);
-      //console.log("add", args);
-      return args.reduce(addReal, 0);
+      var args = [].slice.call(arguments),
+        first = args.shift();
+      //console.log("add", args, first);
+      return args.reduce(addReal, first);
+    },
+    sub = function() {
+      var args = [].slice.call(arguments),
+        first = args.shift();
+      //console.log("sub", args, first);
+      return args.reduce(subtractReal, first);
+    },
+    mul = function() {
+      var args = [].slice.call(arguments),
+        first = args.shift();
+      //console.log("mul", args, first);
+      return args.reduce(multiplyReal, first);
+    },
+    div = function() {
+      var args = [].slice.call(arguments),
+        first = args.shift();
+      //console.log("div", args, first);
+      return args.reduce(divideReal, first);
+    },
+    money = function(num) {
+      return accounting.formatMoney(
+        accounting.toFixed(num, 2)
+      );
     },
     cleanKeys = function cleanKeys(keys) {
       var result = keys.map(function(x) {
@@ -346,6 +379,32 @@ Daytrader.plugin("data", function(app) {
     }),
     keccak = app.keccak.mode("SHAKE-128"),
     api = {
+      "math": {
+        "add": add,
+        "sub": sub,
+        "mul": mul,
+        "div": div,
+        "money": money
+      },
+      "sort": {
+        "obj": function dateSort(options) {
+          // dateSort("asc")
+          var key = options.key,
+            gt = options.dir === "desc" ? -1 : 1,
+            lt = gt * -1;
+          return function(a,b) {
+            var one = a[key],
+              two = b[key];
+            if (one === two) {
+              return 0;
+            } else if (one > two) {
+              return gt;
+            } else {
+              return lt;
+            }
+          };
+        }
+      },
       "ready": false,
       "find": function(by, val) {
         var result;

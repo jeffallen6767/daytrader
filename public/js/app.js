@@ -150,7 +150,9 @@
             app.signin(app.run);
           }
         }
-      }
+      },
+      "CONST_ONE_SPACE": " ",
+      "CONST_NO_SPACE": ""
     },
     methods = Object.keys(app).reduce(function(obj, method) {
       obj[method] = true;

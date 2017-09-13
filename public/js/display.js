@@ -200,8 +200,21 @@ Daytrader.plugin("display", function(app) {
       
       return table;
     },
-    
+    defaultTemplate = '<div>{{default}}</div>',
+    template = function template(html, data) {
+      var result = html,
+        todo = Object.keys(data);
+      todo.forEach(function(key, idx) {
+        var val = data[key],
+          match = new RegExp('{{' + key + '}}','g');
+        result = result.replace(match, val);
+      });
+      return result;
+    },
     api = {
+      "dom": {
+        "replace": domReplace
+      },
       "show": {
         "table": function(type, data, el) {
           console.log("display.show.table", type, data, el);

@@ -68,3 +68,26 @@ h1 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
+
+.hide {
+  display: none!important;
+}
+
+.blackBold {
+  color: black;
+  font-weight: bold;
+}
+
+.redBold {
+  color: red;
+  font-weight: bold;
+}
+
+.symbol-stats-container {
+  margin-bottom: 20px;
+  font-size: 1.4em;
+}
+
+.horizontal-spacer {
+  margin-left: 100px;
+}
