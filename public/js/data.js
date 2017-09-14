@@ -227,6 +227,14 @@ Daytrader.plugin("data", function(app) {
 
       return data;
     },
+    formatDateString = function formatDateString(str) {
+      var parts = str.split("/")
+      return parts.reduce(function(acc, part) {
+        var digits = part < 10 ? ["0", part].join(app.CONST_NO_SPACE) : part;
+        acc.push(part);
+        return acc;
+      }, []).join("/");
+    },
     TD_ACTIONS = {
       "Sold": "Sell",
       "Bought": "Buy",
@@ -264,7 +272,7 @@ Daytrader.plugin("data", function(app) {
         "TradeDate": {
           "key": "trade",
           "val": function(data) {
-            return data["TradeDate"];
+            return formatDateString(data["TradeDate"]);
           }
         },
         "Commission": {
@@ -280,7 +288,7 @@ Daytrader.plugin("data", function(app) {
         "DATE": {
           "key": "trade",
           "val": function(data) {
-            return data["DATE"];
+            return formatDateString(data["DATE"]);
           }
         },
         "TRANSACTION ID": {
@@ -332,6 +340,9 @@ Daytrader.plugin("data", function(app) {
         }
       }
     },
+    formatDate = function formatDate(d) {
+      return moment(d, 'MM/DD/YYYY').format();
+    },
     transform = function transform(type, data) {
       var result = {},
         keys = Object.keys(data),
@@ -348,6 +359,8 @@ Daytrader.plugin("data", function(app) {
           result[key.toLowerCase()] = data[key];
         }
       });
+      // set-up data extras:
+      result.date = formatDate(result.trade);
       return result;
     },
     ids = [],
@@ -390,11 +403,14 @@ Daytrader.plugin("data", function(app) {
         "obj": function dateSort(options) {
           // dateSort("asc")
           var key = options.key,
+            val = options.val || function(obj) {
+              return obj;
+            },
             gt = options.dir === "desc" ? -1 : 1,
             lt = gt * -1;
           return function(a,b) {
-            var one = a[key],
-              two = b[key];
+            var one = val(a[key]),
+              two = val(b[key]);
             if (one === two) {
               return 0;
             } else if (one > two) {
