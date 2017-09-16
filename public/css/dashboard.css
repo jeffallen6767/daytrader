@@ -83,6 +83,10 @@ h1 {
   font-weight: bold;
 }
 
+.transaction {
+  font-size: 0.8em;
+}
+
 .symbol-stats-container {
   margin-bottom: 20px;
   font-size: 1.4em;
