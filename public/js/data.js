@@ -243,6 +243,7 @@ Daytrader.plugin("data", function(app) {
       "MONEY MARKET REDEMPTION": "Cash Adjustment",
       "FREE BALANCE INTEREST": "Credit Interest",
       "MONEY MARKET INTEREST": "Credit Interest",
+      "ORDINARY DIVIDEND": "Dividend",
       "QUALIFIED DIVIDEND": "Dividend",
       "PARTNERSHIP DISTRIBUTION": "Dividend",
       "LONG TERM GAIN DISTRIBUTION": "Dividend",
