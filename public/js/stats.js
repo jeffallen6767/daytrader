@@ -9,27 +9,35 @@ Daytrader.plugin("stats", function(app) {
   var
     data = app.data,
     math = data.math,
-    dateSort = data.sort.obj({
-      "key": "date", 
-      "dir": "asc"
-    }),
+    timeorder = data.sort.objs([
+      {
+        "key": "date", 
+        "dir": "asc"
+      },
+      {
+        "key": "tradenumber", 
+        "dir": "asc"
+      }
+    ]),
     api = {
       "get": function(recs, symbol) {
         
         console.log("stats.api.get", recs, symbol);
         
-        var sorted = recs.sort(dateSort),
+        var 
+          sorted = recs.sort(timeorder),
           upperSymbol = symbol ? symbol.toUpperCase() : null,
           data = {},
           result;
         
         sorted.forEach(function(rec, idx) {
           console.log(idx, rec);
-          var key = rec.symbol,
+          var 
+            key = rec.symbol,
             action = rec.action,
             amt = Math.abs(rec.amount), 
             qty = Math.abs(rec.quantity),
-            fee = Math.abs(rec.commission) + Math.abs(rec.fees),
+            fee = Math.abs(rec.commission),// + Math.abs(rec.fees),
             dat, 
             temp,
             trans,
@@ -57,9 +65,9 @@ Daytrader.plugin("stats", function(app) {
             case "Buy":
               dat.out = math.sub(dat.out, amt);
               dat.fee = math.sub(dat.fee, fee);
-              dat.total = math.sub(dat.total, amt, fee);
+              dat.total = math.sub(dat.total, amt);//, fee);
               dat.shares = math.add(dat.shares, qty);
-              cash = amt + fee;
+              cash = amt;// + fee;
               dat.acc.push({
                 "more": symbol,
                 "num": qty,
@@ -85,9 +93,9 @@ Daytrader.plugin("stats", function(app) {
             case "Sell":
               dat.in = math.add(dat.in, amt);
               dat.fee = math.sub(dat.fee, fee);
-              dat.total = math.add(dat.total, amt, -1 * fee);
+              dat.total = math.add(dat.total, amt);//, -1 * fee);
               dat.shares = math.sub(dat.shares, qty);
-              cash = amt - fee;
+              cash = amt;// - fee;
               temp = qty;
               trans = {
                 "num": 0,

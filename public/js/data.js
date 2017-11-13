@@ -401,25 +401,45 @@ Daytrader.plugin("data", function(app) {
         "money": money
       },
       "sort": {
-        "obj": function dateSort(options) {
-          // dateSort("asc")
-          var key = options.key,
-            val = options.val || function(obj) {
-              return obj;
-            },
-            gt = options.dir === "desc" ? -1 : 1,
-            lt = gt * -1;
-          return function(a,b) {
-            var one = val(a[key]),
-              two = val(b[key]);
-            if (one === two) {
-              return 0;
-            } else if (one > two) {
-              return gt;
-            } else {
-              return lt;
-            }
-          };
+        "objs": function sort_objs(options) {
+          var 
+            num = options.length,
+            dat = options.map(function(obj) {
+              var 
+                k = obj.key,
+                v = obj.val || function(any) {
+                  return any;
+                },
+                g = obj.dir === "desc" ? -1 : 1,
+                l = g * -1,
+                d = {
+                  "key": k,
+                  "val": v,
+                  "gt": g,
+                  "lt": l
+                };
+              return d;
+            }),
+            f = function(a,b,c) {
+              var 
+                d = dat[c || 0],
+                k = d.key,
+                v = d.val,
+                one = v(a[k]),
+                two = v(b[k]);
+              if (one === two) {
+                if (++c < num) {
+                  return f(a,b,c);
+                } else {
+                  return 0;
+                }
+              } else if (one > two) {
+                return d.gt;
+              } else {
+                return d.lt;
+              }
+            };
+          return f;
         }
       },
       "ready": false,
